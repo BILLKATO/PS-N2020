@@ -23,10 +23,14 @@ console.log('API funcionando!');
  app.get('/produtos/:cod_prod?', (req, res) =>{
 
 	 var sql="";
+	 var filtro1 =""
+
+	 if(req.params.cod_prod)
+	  filtro1 = " WHERE cod_prod = "+req.params.cod_prod.toString();
 
 	 sql = "SELECT * FROM produtos";
 
-     execSQLQuery(sql, res, 0)
+     execSQLQuery(sql+filtro1, res, 0)
      });
 
 
@@ -50,8 +54,6 @@ console.log('API funcionando!');
 	 if(req.body.preco)
 	  filtro4 = req.body.preco.toString();
 
-	 values = [[filtro1,filtro2,filtro3,filtro4]]
-
 	 sql  = " INSERT INTO produtos(cod_prod,nome_prod,descricao,preco)";
 	 sql += " VALUES("+filtro1+",'"+filtro2+"','"+filtro3+"',"+filtro4+")";
 
@@ -71,14 +73,122 @@ console.log('API funcionando!');
 	 if(req.body.preco)
 	  filtro2 = req.body.preco.toString();
 
-	 values = [[filtro1,filtro2,filtro3,filtro4]]
 
-	 sql  = " UPDATE TABLE produtos SET preco = "+ filtro2 ;
+	 sql  = " UPDATE produtos SET preco = "+ filtro2 ;
 	 sql += " WHERE cod_prod ="+filtro1;
 
      execSQLQuery(sql, res, 0)
      });
 
+ app.put('/produtos/', (req, res) =>{
+
+	 var sql="";
+	 var filtro1="";
+	 var filtro2="";
+
+	 if(req.body.cod_prod)
+	  filtro1 = req.body.cod_prod.toString();
+
+	 if(req.body.preco)
+	  filtro2 = req.body.preco.toString();
+
+
+	 sql  = " UPDATE produtos SET preco = "+ filtro2 ;
+	 sql += " WHERE cod_prod ="+filtro1;
+
+     execSQLQuery(sql, res, 0)
+     });
+
+
+ app.delete('/produtos/:cod_prod', (req, res) =>{
+
+	 var sql="";
+	 var filtro1="";
+
+	 if(req.params.cod_prod)
+	  filtro1 = req.params.cod_prod.toString();
+
+	 sql = "DELETE FROM produtos WHERE cod_prod = "+filtro1;
+
+     execSQLQuery(sql, res, 0)
+     });
+
+ app.get('/pedidos/:cod_ped?', (req, res) =>{
+
+	 var sql="";
+	 var filtro1="";
+
+	 if(req.params.cod_ped)
+	  filtro1 = " WHERE cod_pedido = "+req.params.cod_ped.toString();
+
+	 sql = "SELECT * FROM pedidos PE LEFT JOIN produtos P ON P.cod_prod = PE.cod_prod";
+
+     execSQLQuery(sql+filtro1, res, 0)
+     });
+
+ app.post('/pedidos/', (req, res) =>{
+
+	 var sql="";
+	 var filtro1="";
+	 var filtro2="";
+	 var filtro3="";
+	 var filtro4="";
+
+	 if(req.body.cod_prod)
+	  filtro2 = req.body.cod_prod.toString();
+
+	 if(req.body.cod_pedido)
+	  filtro1 = req.body.cod_pedido.toString();
+
+	 if(req.body.qtd)
+	  filtro3 = req.body.qtd.toString();
+
+	 if(req.body.preco_unit)
+	  filtro4 = req.body.preco_unit.toString();
+
+
+	 sql  = " INSERT INTO pedidos(cod_pedido,cod_prod,qtd,preco_total)";
+	 sql += " VALUES("+filtro1+","+filtro2+","+filtro3+",("+filtro4+"*"+filtro3+"))";
+
+     execSQLQuery(sql, res, 0)
+     });
+
+
+ app.put('/pedidos/', (req, res) =>{
+
+	 var sql="";
+	 var filtro1="";
+	 var filtro2="";
+	 var filtro3="";
+
+	 if(req.body.cod_prod)
+	  filtro3 = req.body.cod_prod.toString();
+
+	 if(req.body.preco_total)
+	  filtro2 = req.body.preco_total.toString();
+
+	 if(req.body.cod_pedido)
+	  filtro1 = req.body.cod_pedido.toString();
+
+	 sql  = " UPDATE pedidos SET preco_total = "+ filtro2 ;
+	 sql += " WHERE cod_pedido = "+filtro1+" AND cod_prod = "+filtro3;
+
+     execSQLQuery(sql, res, 0)
+     });
+
+
+  app.delete('/pedidos/:cod_ped', (req, res) =>{
+
+	 var sql="";
+	 var filtro1="";
+
+	 if(req.params.cod_ped)
+	  filtro1 = req.params.cod_ped.toString();
+
+	 sql = "DELETE FROM pedidos WHERE cod_pedido = "+filtro1;
+
+     execSQLQuery(sql, res, 0)
+     });
 
 function execSQLQuery(sqlQry, res, up){
  const connection = mysql.createConnection({
@@ -91,9 +201,18 @@ function execSQLQuery(sqlQry, res, up){
 
 
   connection.query(sqlQry, function(error, results, fields){
-	 if(error == null) res.json(results);
-	 else if(error.code == "ER_DUP_ENTRY") res.json("Usuario Existente");
+	 if(error == null)
+	 {
+	  if(results.affectedRows != 0 && results.affectedRows != null && results.affectedRows != undefined)
+	   res.json("Registro Inserido!");
+	  else
+ 	   res.json(results);
+ 	 }
+	 else if(error.code == "ER_DUP_ENTRY") res.json("Registro Existente");
 	 else if(error) res.json(error);
+
+
+
       connection.end();
       console.log('executou!');
   });
