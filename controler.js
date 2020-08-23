@@ -190,6 +190,12 @@ console.log('API funcionando!');
      execSQLQuery(sql, res, 0)
      });
 
+ app.post('/twilo/', (req, res) =>{
+
+	 console.log(req.body);
+
+     });
+
 function execSQLQuery(sqlQry, res, up){
  const connection = mysql.createConnection({
 	host:'remotemysql.com',
