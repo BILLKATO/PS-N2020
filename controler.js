@@ -194,6 +194,8 @@ console.log('API funcionando!');
 
 	 console.log(req.body);
 
+	 res.json("oi");
+
      });
 
 function execSQLQuery(sqlQry, res, up){
