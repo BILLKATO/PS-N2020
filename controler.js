@@ -209,15 +209,10 @@ function execSQLQuery(sqlQry, res, up){
 
 
   connection.query(sqlQry, function(error, results, fields){
-
 	 if(error == null)
 	 {
-	  if(results.affectedRows != 0 && results.affectedRows != null && results.affectedRows != undefined && sqlQry.indexOf("INSERT") != -1 )
+	  if(results.affectedRows != 0 && results.affectedRows != null && results.affectedRows != undefined)
 	   res.json("Registro Inserido!");
-	  else if(results.affectedRows != 0 && results.affectedRows != null && results.affectedRows != undefined && sqlQry.indexOf("UPDATE") != -1)
-	   res.json("Registro Atualizado!");
-	  else if(results.affectedRows != 0 && results.affectedRows != null && results.affectedRows != undefined && sqlQry.indexOf("DELETE") != -1)
-	   res.json("Registro Deletado!");
 	  else
  	   res.json(results);
  	 }
